@@ -34,7 +34,7 @@ func FindFriendsUnderAge(ctx context.Context, driver neo4j.DriverWithContext, us
 func FindFriendsOfFriends(ctx context.Context, driver neo4j.DriverWithContext, user string, dbName string) (friends []model.Person) {
 	result, err := neo4j.ExecuteQuery(ctx, driver, `
        MATCH (p:Person {name: "Peter"})-[:KNOWS]-(friend:Person)-[:KNOWS]-(ffriend:Person) 
-       RETURN ffriend
+       RETURN DISTINCT ffriend
         `, map[string]any{
 		"name": user,
 	}, neo4j.EagerResultTransformer,
@@ -49,5 +49,6 @@ func FindFriendsOfFriends(ctx context.Context, driver neo4j.DriverWithContext, u
 		p, _ := util.ConvertToPerson(node)
 		friends = append(friends, p)
 	}
+
 	return friends
 }
